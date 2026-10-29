@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <input id="input" placeholder="Add a task" />
+  <button id="add">Add</button>
+  <ul id="list"></ul>
+
+  <script>
+    const input = document.getElementById("input");
+    const addBtn = document.getElementById("add");
+    const list = document.getElementById("list");
+
+    let todos = JSON.parse(localStorage.getItem("todos") || "[]");
+
+    function render() {
+      list.innerHTML = "";
+      todos.forEach((todo, i) => {
+        const li = document.createElement("li");
+        li.textContent = todo.text;
+        if (todo.done) li.style.textDecoration = "line-through";
+
+        li.addEventListener("click", () => {
+          todos[i].done = !todos[i].done;
+          save();
+        });
+
+        const del = document.createElement("button");
+        del.textContent = " ✕";
+        del.addEventListener("click", (e) => {
+          e.stopPropagation();
+          todos.splice(i, 1);
+          save();
+        });
+
+        li.appendChild(del);
+        list.appendChild(li);
+      });
+    }
+
+    function save() {
+      localStorage.setItem("todos", JSON.stringify(todos));
+      render();
+    }
+
+    function addTodo() {
+      const text = input.value.trim();
+      if (!text) return;
+      todos.push({ text, done: false });
+      input.value = "";
+      save();
+    }
+
+    addBtn.addEventListener("click", addTodo);
+    input.addEventListener("keydown", (e) => e.key === "Enter" && addTodo());
+    render();
+  </script>
+</body>
+</html>
