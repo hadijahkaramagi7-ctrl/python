@@ -1,0 +1,17 @@
+// Primitives
+const nums = [1, 2, 2, 3, 3, 3];
+const unique = [...new Set(nums)]; // [1, 2, 3]
+
+// Objects (by a key)
+function uniqueBy(arr, key) {
+  const seen = new Set();
+  return arr.filter((item) => {
+    const val = item[key];
+    if (seen.has(val)) return false;
+    seen.add(val);
+    return true;
+  });
+}
+
+const items = [{ id: 1 }, { id: 1 }, { id: 2 }];
+console.log(uniqueBy(items, "id")); // [{id:1}, {id:2}]
