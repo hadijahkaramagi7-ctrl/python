@@ -1,0 +1,15 @@
+function flatten(arr, depth = Infinity) {
+  return arr.reduce((acc, item) => {
+    if (Array.isArray(item) && depth > 0) {
+      acc.push(...flatten(item, depth - 1));
+    } else {
+      acc.push(item);
+    }
+    return acc;
+  }, []);
+}
+
+console.log(flatten([1, [2, [3, [4]]]])); // [1, 2, 3, 4]
+console.log(flatten([1, [2, [3, [4]]]], 1)); // [1, 2, [3, [4]]]
+
+// Built-in: [1, [2, [3]]].flat(Infinity)
