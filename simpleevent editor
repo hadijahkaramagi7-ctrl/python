@@ -1,0 +1,26 @@
+class EventEmitter {
+  constructor() {
+    this.events = new Map();
+  }
+
+  on(event, listener) {
+    if (!this.events.has(event)) this.events.set(event, []);
+    this.events.get(event).push(listener);
+    return () => this.off(event, listener); // unsubscribe
+  }
+
+  off(event, listener) {
+    const listeners = this.events.get(event) || [];
+    this.events.set(event, listeners.filter((l) => l !== listener));
+  }
+
+  emit(event, ...args) {
+    (this.events.get(event) || []).forEach((fn) => fn(...args));
+  }
+}
+
+const emitter = new EventEmitter();
+const unsub = emitter.on("greet", (name) => console.log(`Hello, ${name}!`));
+emitter.emit("greet", "World"); // Hello, World!
+unsub();
+emitter.emit("greet", "Again"); // (nothing)
