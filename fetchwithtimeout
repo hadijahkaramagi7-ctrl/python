@@ -1,0 +1,23 @@
+async function fetchWithRetry(url, { retries = 3, timeout = 5000, ...options } = {}) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const res = await fetch(url, { ...options, signal: controller.signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.warn(`Attempt ${attempt} failed:`, err.message);
+      if (attempt === retries) throw err;
+      await new Promise((r) => setTimeout(r, 1000 * attempt)); // backoff
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+}
+
+// Usage
+// fetchWithRetry("https://api.example.com/data")
+//   .then(console.log)
+//   .catch(console.error);
