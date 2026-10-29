@@ -1,0 +1,26 @@
+import requests
+
+# Replace with your personal access token
+TOKEN = "ghp_your_personal_access_token_here"
+USERNAME = "your_username"
+
+headers = {
+    "Authorization": f"token {TOKEN}",
+    "Accept": "application/vnd.github.v3+json"
+}
+
+data = {
+    "name": "my-new-repo",
+    "description": "A repository created via API",
+    "private": False,
+    "auto_init": True
+}
+
+response = requests.post(
+    "https://api.github.com/user/repos",
+    headers=headers,
+    json=data
+)
+
+print(response.status_code)
+print(response.json())
