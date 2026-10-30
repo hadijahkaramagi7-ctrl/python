@@ -1,0 +1,31 @@
+import requests, base64, os
+
+TOKEN = "YOUR_TOKEN"
+USER = "YOUR_USERNAME"
+headers = {"Authorization": f"token {TOKEN}", "Accept": "application/vnd.github+json"}
+
+# 1. Create repo
+r = requests.post(
+    "https://api.github.com/user/repos",
+    json={"name": "my-new-repo", "private": False, "auto_init": True},
+    headers=headers,
+)
+print("Repo:", r.json().get("html_url"))
+
+# 2. Upload local files
+REPO = "my-new-repo"
+for root, _, files in os.walk("./my_project"):
+    for f in files:
+        full = os.path.join(root, f)
+        rel = os.path.relpath(full, "./my_project").replace("\\", "/")
+        with open(full, "rb") as fh:
+            content = base64.b64encode(fh.read()).decode()
+
+        url = f"https://api.github.com/repos/{USER}/{REPO}/contents/{rel}"
+        # get sha if exists
+        g = requests.get(url, headers=headers)
+        sha = g.json().get("sha") if g.status_code == 200 else None
+        data = {"message": f"Add {rel}", "content": content, "branch": "main"}
+        if sha: data["sha"] = sha
+        requests.put(url, json=data, headers=headers)
+        print("Uploaded", rel)
