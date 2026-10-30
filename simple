@@ -1,0 +1,17 @@
+import requests, base64
+
+TOKEN = "YOUR_TOKEN"
+OWNER, REPO, PATH = "user", "repo", "README.md"
+
+url = f"https://api.github.com/repos/{OWNER}/{REPO}/contents/{PATH}"
+h = {"Authorization": f"token {TOKEN}"}
+
+old = requests.get(url, headers=h).json()
+new_content = "# Updated by script\n"
+
+requests.put(url, headers=h, json={
+    "message": "Update README",
+    "content": base64.b64encode(new_content.encode()).decode(),
+    "sha": old["sha"],
+    "branch": "main",
+})
